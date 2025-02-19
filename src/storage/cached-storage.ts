@@ -38,23 +38,22 @@ export class CachedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Clears values matching the given pattern from storage and cache.
-	 * @param pattern - A pattern to match keys.
+	 * Clears values from the storage and cache.
+	 * This method deletes keys matching the pattern in the underlying storage by calling super.clear(),
+	 * based on the includeSubStorages flag, and then removes matching entries from the in-memory cache.
+	 * @param pattern - Pattern to match keys against. If omitted, defaults to the storage prefix.
+	 * @param includeSubStorages - Whether to clear values in sub-storages.
 	 */
-	clear(pattern?: string): void {
-		if (this.prefix.length > 0) {
-			if (!pattern) pattern = this.prefix;
-			else pattern = this.prefix + pattern;
-			const keys = this.getStorage().getDynamicPropertyIds();
-			for (const key of keys) {
-				if (key.startsWith(pattern)) {
-					this.getStorage().setDynamicProperty(key);
-					this.cache.delete(key);
-				}
+	clear(pattern?: string, includeSubStorages: boolean = true): void {
+		// Use the updated behavior from PropertyStorage to clear underlying storage.
+		super.clear(pattern, includeSubStorages);
+		// Determine effective pattern.
+		const effectivePattern = pattern ? this.prefix + pattern : this.prefix;
+		// Remove corresponding keys from the cache.
+		for (const key of this.cache.keys()) {
+			if (key.startsWith(effectivePattern)) {
+				this.cache.delete(key);
 			}
-		} else {
-			this.getStorage().clearDynamicProperties();
-			this.cache.clear();
 		}
 	}
 

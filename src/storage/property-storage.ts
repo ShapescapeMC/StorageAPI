@@ -67,25 +67,36 @@ export class PropertyStorage {
 
 	/**
 	 * Clears all values from the storage.
-	 * @param pattern - Pattern to match keys against.
-	 * @param includeSubStorages - Whether to clear sub-storages as well.
+	 * This method deletes keys matching the pattern in the main storage.
+	 * If includeSubStorages is true, it also recursively clears values within each sub-storage,
+	 * leaving the sub-storage container itself intact.
+	 * @param pattern - Pattern to match keys against. If omitted, defaults to the storage prefix.
+	 * @param includeSubStorages - Whether to clear values in sub-storages.
 	 */
 	clear(pattern?: string, includeSubStorages: boolean = true): void {
-		if (this.prefix.length > 0) {
-			if (!pattern || pattern == "") pattern = this.prefix;
-			else pattern = this.prefix + pattern;
-			const keys = this.getStorage().getDynamicPropertyIds();
-			const subStorages = this.get("subStorages", false, []);
-			for (const key of keys) {
-				if (
-					key.startsWith(pattern) &&
-					(!subStorages.includes(key) || includeSubStorages)
-				) {
-					this.getStorage().setDynamicProperty(key);
-				}
+		// Determine the effective pattern
+		const effectivePattern = pattern ? this.prefix + pattern : this.prefix;
+		const keys = this.getStorage().getDynamicPropertyIds();
+		// Retrieve sub-storage identifiers (container keys)
+		const subStorages: string[] = this.get("subStorages", false, []);
+
+		// Clear keys in the main storage except those that exactly correspond to substorage containers
+		for (const key of keys) {
+			if (key.startsWith(effectivePattern)) {
+				// Do not clear if the key exactly matches a substorage container key
+				if (subStorages.includes(key)) continue;
+				this.getStorage().setDynamicProperty(key);
 			}
-		} else {
-			this.getStorage().clearDynamicProperties();
+		}
+
+		// If requested, clear values within each sub-storage recursively (without deleting the substorage container)
+		if (includeSubStorages) {
+			for (const sub of subStorages) {
+				// Create sub-storage instance for each sub-storage key
+				const subStore = this.getSubStorage(sub);
+				// Clear all keys within the sub-storage; passing undefined pattern clears all keys inside.
+				subStore.clear(undefined, false);
+			}
 		}
 	}
 
