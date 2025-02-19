@@ -6,31 +6,37 @@ import {
 import { MultiArray } from "./multi-array";
 
 /**
- * ExtendedStorage is a Storage that allows to store more than 32KiB of data in each key.
+ * ExtendedStorage is a storage class that allows storing values larger than 32KiB
+ * by splitting them into chunks. It also supports array storage.
  */
 export class ExtendedStorage extends PropertyStorage {
+	/**
+	 * Initialization flag.
+	 * @private
+	 */
 	private init = false;
 	/**
-	 * Checks whether the storage is an ExtendedStorage.
-	 * @param storage The storage to use.
+	 * Checks whether the provided storage is an ExtendedStorage.
+	 * @param storage - The storage instance.
+	 * @returns True if extended.
 	 */
 	static isExtendedStorage(storage: PropertyStorage): boolean {
 		return storage.get("shape_extended_storage");
 	}
 
 	/**
-	 * @hidden
+	 * Initializes the extended storage.
 	 * @private
 	 */
-	private initStorage() {
+	private initStorage(): void {
 		super.set("shape_extended_storage", true);
 		this.init = true;
 	}
 
 	/**
-	 * Sets the index of a value.
-	 * @param key The key of the value.
-	 * @param index The index to set.
+	 * Sets the index for a value.
+	 * @param key - The key of the value.
+	 * @param index - The index definition.
 	 */
 	setIndex(key: string, index: Index | undefined): void {
 		super.set(key + ".index", index);
@@ -38,8 +44,9 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Gets the index of a value.
-	 * @param key The key of the value.
+	 * Gets the index for a value.
+	 * @param key - The key of the value.
+	 * @returns The index definition.
 	 */
 	getIndex(key: string): Index | undefined {
 		const value = super.get(key + ".index");
@@ -51,9 +58,9 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Sets the index of an array.
-	 * @param key The key of the array.
-	 * @param index The index to set.
+	 * Sets the array index structure.
+	 * @param key - The key of the array.
+	 * @param index - The array index definition.
 	 */
 	setArrayIndex(key: string, index: ArrayIndex | undefined): void {
 		super.set(key, index);
@@ -61,8 +68,9 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Gets the index of an array.
-	 * @param key The key of the array.
+	 * Gets the array index structure.
+	 * @param key - The key of the array.
+	 * @returns The array index definition.
 	 */
 	getArrayIndex(key: string): ArrayIndex | undefined {
 		const value = super.get(key + ".index");
@@ -74,10 +82,10 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Sets a value in the storage.
-	 * @param key The key of the value.
-	 * @param value The value to set.
-	 * @param options The serialization options to use. Default is `undefined`.
+	 * Sets a value in extended storage. For values larger than 32KiB, splits into chunks.
+	 * @param key - The key to set.
+	 * @param value - The value to store.
+	 * @param options - Optional serialization options.
 	 */
 	set(key: string, value: any, options?: SerializationOptions): void {
 		let index = this.getIndex(key);
@@ -100,11 +108,12 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Gets a value from the storage.
-	 * @param key The key of the value.
-	 * @param deserialize Whether to deserialize the value. Default is `true`.
-	 * @param defaultValue
-	 * @param options The deserialization options to use. Default is `undefined`.
+	 * Gets a value from extended storage.
+	 * @param key - The key to retrieve.
+	 * @param deserialize - Whether to deserialize the string result.
+	 * @param defaultValue - The default value if not found.
+	 * @param options - Optional deserialization options.
+	 * @returns The stored value.
 	 */
 	get(
 		key: string,
@@ -133,8 +142,8 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Removes a value from the storage.
-	 * @param key The key of the value.
+	 * Removes a value from extended storage.
+	 * @param key - The key to remove.
 	 */
 	drop(key: string): void {
 		if (this.isArray(key)) {
@@ -161,8 +170,9 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Returns a MultiArray object that allows to navigate from the start and manipulate an array stored in the storage.
-	 * @param key The key of the array.
+	 * Retrieves a MultiArray instance to navigate a linked list array.
+	 * @param key - The key of the array.
+	 * @returns The MultiArray instance.
 	 */
 	getMultiArray(key: string): MultiArray {
 		const arrayIndex = this.getArrayIndex(key);
@@ -174,10 +184,10 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Appends a value to the end of the array.
-	 * @param key The key of the array.
-	 * @param value The value to append.
-	 * @param options The serialization options to use. Default is `undefined`.
+	 * Appends a value to the end of an array.
+	 * @param key - The array key.
+	 * @param value - The value to append.
+	 * @param options - Optional serialization options.
 	 */
 	rPush(key: string, value: any, options?: SerializationOptions): void {
 		const index = this.assertMultiArray(key, true);
@@ -195,10 +205,10 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Prepends a value to the start of the array.
-	 * @param key The key of the array.
-	 * @param value The value to prepend.
-	 * @param options The serialization options to use. Default is `undefined`.
+	 * Prepends a value to the start of an array.
+	 * @param key - The array key.
+	 * @param value - The value to prepend.
+	 * @param options - Optional serialization options.
 	 */
 	lPush(key: string, value: any, options?: SerializationOptions): void {
 		const index = this.assertMultiArray(key, true);
@@ -216,10 +226,11 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Removes the last element from the array and returns it.
-	 * @param key The key of the array.
-	 * @param deserialize Whether to deserialize the value. Default is `true`.
-	 * @param options The deserialization options to use. Default is `undefined`.
+	 * Removes and returns the last element of an array.
+	 * @param key - The array key.
+	 * @param deserialize - Whether to deserialize the value.
+	 * @param options - Optional deserialization options.
+	 * @returns The removed element.
 	 */
 	rPop(
 		key: string,
@@ -236,10 +247,11 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Removes the first element from the array and returns it.
-	 * @param key The key of the array.
-	 * @param deserialize Whether to deserialize the value. Default is `true`.
-	 * @param options The deserialization options to use. Default is `undefined`.
+	 * Removes and returns the first element of an array.
+	 * @param key - The array key.
+	 * @param deserialize - Whether to deserialize the value.
+	 * @param options - Optional deserialization options.
+	 * @returns The removed element.
 	 */
 	lPop(
 		key: string,
@@ -256,8 +268,9 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Checks whether the array is empty.
-	 * @param key The key of the array.
+	 * Checks whether an array is empty.
+	 * @param key - The array key.
+	 * @returns True if empty.
 	 */
 	isArrayEmpty(key: string): boolean {
 		const index = this.getArrayIndex(key);
@@ -265,8 +278,9 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Checks whether the value is an array.
-	 * @param key The key of the value.
+	 * Checks whether the value at a key is an array.
+	 * @param key - The key to check.
+	 * @returns True if an array.
 	 */
 	isArray(key: string): boolean {
 		const index = this.getArrayIndex(key);
@@ -274,8 +288,9 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Gets the length of the array.
-	 * @param key The key of the array.
+	 * Retrieves the length of an array.
+	 * @param key - The array key.
+	 * @returns The length.
 	 */
 	getArrayLength(key: string): number {
 		if (!this.isArray(key)) return 0;
@@ -291,9 +306,10 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Gets the sub index of an element in the array.
-	 * @param key The key of the array.
-	 * @param index The index of the element.
+	 * Gets the sub-index for an element in an array.
+	 * @param key - The array key.
+	 * @param index - The element index.
+	 * @returns The SubIndex definition.
 	 */
 	getSubIndex(key: string, index: number): SubIndex | undefined {
 		const arrayIndex = this.getArrayIndex(key);
@@ -302,10 +318,10 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * @internal
-	 * Asserts that the key is an array and returns its index.
-	 * @param key The key of the array.
-	 * @param create Whether to create the index in the persistent storage if it doesn't exist. Default is `false`.
+	 * Asserts the key is an array and returns its index structure.
+	 * @param key - The key to assert.
+	 * @param create - Whether to create the index if it does not exist.
+	 * @returns The ArrayIndex structure.
 	 */
 	assertMultiArray(key: string, create: boolean = false): ArrayIndex {
 		let index = this.getArrayIndex(key);
@@ -323,10 +339,10 @@ export class ExtendedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * @internal
 	 * Splits a value into chunks of a specified size.
-	 * @param input The value to split.
-	 * @param chunkSize The size of each chunk. Default is 32KiB.
+	 * @param input - The value to split.
+	 * @param chunkSize - The maximum size per chunk (default 32KiB).
+	 * @returns An array of chunk strings.
 	 */
 	splitValueIntoChunks(
 		input: string | number | boolean,
@@ -355,6 +371,11 @@ export class ExtendedStorage extends PropertyStorage {
 		return result;
 	}
 
+	/**
+	 * Retrieves a sub-storage with a given prefix.
+	 * @param prefix - The sub-storage identifier.
+	 * @returns A new ExtendedStorage instance with the sub-storage prefix.
+	 */
 	getSubStorage(prefix: string) {
 		this.registerSubStorage(prefix);
 		return new ExtendedStorage(
@@ -365,22 +386,46 @@ export class ExtendedStorage extends PropertyStorage {
 }
 
 /**
- * Index is a structure that stores the number of chunks in a value.
+ * Structure representing the index of a stored value.
+ * @interface
  */
 export interface Index {
+	/**
+	 * Number of chunks the value was split into.
+	 */
 	max: number;
 }
 
 /**
- * ArrayIndex is a structure that stores the start and end of an array, as well as the previous and next indexes of each element.
+ * Structure representing an array index.
+ * @interface
  */
 export interface ArrayIndex {
+	/**
+	 * Starting index of the array.
+	 */
 	start: number;
+	/**
+	 * Ending index of the array.
+	 */
 	end: number;
+	/**
+	 * Additional mapping for sub-indexes.
+	 */
 	[key: number]: SubIndex;
 }
 
+/**
+ * Structure representing the relationships between array elements.
+ * @interface
+ */
 export interface SubIndex {
+	/**
+	 * The previous element index or null.
+	 */
 	prev: number | null;
+	/**
+	 * The next element index or null.
+	 */
 	next: number | null;
 }

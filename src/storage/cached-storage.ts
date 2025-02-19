@@ -4,14 +4,21 @@ import {
 	SerializationOptions,
 } from "./property-storage";
 
+/**
+ * CachedStorage is a decoration of PropertyStorage that maintains an in-memory cache
+ * to optimize repeated key access.
+ */
 export class CachedStorage extends PropertyStorage {
+	/**
+	 * In-memory cache storage.
+	 */
 	private readonly cache: Map<string, any> = new Map();
 
 	/**
-	 * Sets a value in the storage.
-	 * @param key The key to set.
-	 * @param value The value to set. This can be any JSON-serializable value.
-	 * @param options Serialization options.
+	 * Sets a value in the storage and caches it.
+	 * @param key - The key to set.
+	 * @param value - The value (must be JSON-serializable).
+	 * @param options - Optional serialization options.
 	 */
 	set(key: string, value: any, options?: SerializationOptions): void {
 		key = this.prefix + key;
@@ -21,8 +28,8 @@ export class CachedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Removes a value from the storage.
-	 * @param key The key to remove.
+	 * Removes a value from both the storage and the in-memory cache.
+	 * @param key - The key to remove.
 	 */
 	remove(key: string): void {
 		key = this.prefix + key;
@@ -31,8 +38,8 @@ export class CachedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Clears all values from the storage.
-	 * @param pattern A pattern to match keys against. If provided, only keys that match the pattern will be cleared.
+	 * Clears values matching the given pattern from storage and cache.
+	 * @param pattern - A pattern to match keys.
 	 */
 	clear(pattern?: string): void {
 		if (this.prefix.length > 0) {
@@ -52,12 +59,12 @@ export class CachedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Gets a value from the storage.
-	 * @param key The key to get.
-	 * @param deserialize Whether to deserialize the value.
-	 * @param defaultValue The default value to return if the key does not exist.
-	 * @param options Deserialization options.
-	 * @returns The value if it exists, or `undefined` if it does not.
+	 * Retrieves a value from the cache or storage.
+	 * @param key - The key to fetch.
+	 * @param deserialize - Whether to deserialize the value.
+	 * @param defaultValue - The default value if the key does not exist.
+	 * @param options - Optional deserialization options.
+	 * @returns The fetched value.
 	 */
 	get(
 		key: string,
@@ -75,11 +82,11 @@ export class CachedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Gets all values from the storage. Could lead to performance issues if the storage is large.
-	 * @param pattern A pattern to match keys against. If provided, only keys that match the pattern will be returned.
-	 * @param deserialize Whether to deserialize the values.
-	 * @param options Deserialization options.
-	 * @returns An array of key-value pairs.
+	 * Retrieves all key-value pairs that match the specified pattern.
+	 * @param pattern - A pattern to filter keys.
+	 * @param deserialize - Whether to deserialize the values.
+	 * @param options - Optional deserialization options.
+	 * @returns An array of key-value pair objects.
 	 */
 	getAll(
 		pattern?: string,
@@ -103,6 +110,11 @@ export class CachedStorage extends PropertyStorage {
 		return properties;
 	}
 
+	/**
+	 * Retrieves a sub-storage instance with a given prefix.
+	 * @param prefix - The sub-storage identifier.
+	 * @returns A new CachedStorage instance.
+	 */
 	getSubStorage(prefix: string) {
 		this.registerSubStorage(prefix);
 		return new CachedStorage(

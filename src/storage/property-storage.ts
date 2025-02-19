@@ -5,20 +5,37 @@ import {
 	Vector3,
 	World,
 } from "@minecraft/server";
+
 /**
  * Abstraction for a persistent Minecraft storage allowing for easy storage of data.
  */
 export class PropertyStorage {
+	/**
+	 * Maximum allowed byte size for a value.
+	 * @private
+	 */
 	protected readonly MAX_BYTE_SIZE = 32 * 1024 - 1;
 
+	/**
+	 * The underlying storage backend.
+	 */
 	private readonly storage:
 		| Entity
 		| World
 		| ItemStack
 		| ContainerSlot
 		| DynamicStorage;
+
+	/**
+	 * Optional prefix for keys.
+	 */
 	protected readonly prefix: string;
 
+	/**
+	 * Creates a new PropertyStorage instance.
+	 * @param storage - The dynamic storage object.
+	 * @param prefix - Optional key prefix.
+	 */
 	constructor(
 		storage: Entity | World | ItemStack | ContainerSlot | DynamicStorage,
 		prefix?: string,
@@ -29,9 +46,9 @@ export class PropertyStorage {
 
 	/**
 	 * Sets a value in the storage.
-	 * @param key The key to set.
-	 * @param value The value to set. This can be any JSON-serializable value.
-	 * @param options Serialization options.
+	 * @param key - The key to set.
+	 * @param value - The value to set, can be any JSON-serializable value.
+	 * @param options - Optional serialization options.
 	 */
 	set(key: string, value: any, options?: SerializationOptions): void {
 		key = this.prefix + key;
@@ -41,7 +58,7 @@ export class PropertyStorage {
 
 	/**
 	 * Removes a value from the storage.
-	 * @param key The key to remove.
+	 * @param key - The key to remove.
 	 */
 	drop(key: string): void {
 		key = this.prefix + key;
@@ -50,8 +67,8 @@ export class PropertyStorage {
 
 	/**
 	 * Clears all values from the storage.
-	 * @param pattern A pattern to match keys against. If provided, only keys that start with the pattern will be cleared.
-	 * @param includeSubStorages Whether to clear sub-storages as well.
+	 * @param pattern - Pattern to match keys against.
+	 * @param includeSubStorages - Whether to clear sub-storages as well.
 	 */
 	clear(pattern?: string, includeSubStorages: boolean = true): void {
 		if (this.prefix.length > 0) {
@@ -74,11 +91,11 @@ export class PropertyStorage {
 
 	/**
 	 * Gets a value from the storage.
-	 * @param key The key to get.
-	 * @param deserialize Whether to deserialize the value.
-	 * @param defaultValue The default value to return if the key does not exist.
-	 * @param options Deserialization options.
-	 * @returns The value if it exists, or `undefined` if it does not.
+	 * @param key - The key to get.
+	 * @param deserialize - Whether to deserialize the value.
+	 * @param defaultValue - A default value returned if the key does not exist.
+	 * @param options - Optional deserialization options.
+	 * @returns The stored value or the default value.
 	 */
 	get(
 		key: string,
@@ -95,11 +112,11 @@ export class PropertyStorage {
 	}
 
 	/**
-	 * Gets all values from the storage. Could lead to performance issues if the storage is large.
-	 * @param pattern A pattern to match keys against. If provided, only keys that match the pattern will be returned.
-	 * @param deserialize Whether to deserialize the values.
-	 * @param options Deserialization options.
-	 * @returns An array of key-value pairs.
+	 * Gets all values from the storage.
+	 * @param pattern - Pattern to match keys against.
+	 * @param deserialize - Whether to deserialize the returned values.
+	 * @param options - Optional deserialization options.
+	 * @returns Array of key-value pair objects.
 	 */
 	getAll(
 		pattern?: string,
@@ -123,9 +140,9 @@ export class PropertyStorage {
 	}
 
 	/**
-	 * Pushes a value to the end of an array in the storage.
-	 * @param key The key of the array.
-	 * @param value The value to push.
+	 * Pushes a value to the end of an array stored in the storage.
+	 * @param key - The key of the array.
+	 * @param value - The value to push.
 	 */
 	rPush(key: string, value: any): void {
 		const property = this.assertArray(key, true);
@@ -134,9 +151,9 @@ export class PropertyStorage {
 	}
 
 	/**
-	 * Pushes a value to the start of an array in the storage.
-	 * @param key The key of the array.
-	 * @param value The value to push.
+	 * Pushes a value to the beginning of an array stored in the storage.
+	 * @param key - The key of the array.
+	 * @param value - The value to push.
 	 */
 	lPush(key: string, value: any): void {
 		const property = this.assertArray(key, true);
@@ -145,9 +162,9 @@ export class PropertyStorage {
 	}
 
 	/**
-	 * Pops a value from the end of an array in the storage.
-	 * @param key The key of the array.
-	 * @returns The value that was popped.
+	 * Pops a value from the end of an array.
+	 * @param key - The key of the array.
+	 * @returns The value popped.
 	 */
 	rPop(key: string): any {
 		const property = this.assertArray(key);
@@ -157,9 +174,9 @@ export class PropertyStorage {
 	}
 
 	/**
-	 * Pops a value from the start of an array in the storage.
-	 * @param key The key of the array.
-	 * @returns The value that was popped.
+	 * Pops a value from the beginning of an array.
+	 * @param key - The key of the array.
+	 * @returns The value popped.
 	 */
 	lPop(key: string): any {
 		const property = this.assertArray(key);
@@ -169,24 +186,35 @@ export class PropertyStorage {
 	}
 
 	/**
-	 * Check the byte size of a value in the storage.
-	 * @param key The key of the value.
+	 * Calculates the byte size of a stored value.
+	 * @param key - The key of the value.
+	 * @returns The byte length.
 	 */
 	getByteSize(key: string): number {
 		return this.encodeValue(this.get(key, false)).byteLength;
 	}
 
 	/**
-	 * Get the storage object.
+	 * Retrieves the underlying storage object.
+	 * @returns The dynamic storage.
 	 */
 	getStorage(): DynamicStorage {
 		return this.storage;
 	}
 
+	/**
+	 * Builds a sub-storage prefix based on a given identifier.
+	 * @param prefix - The sub-storage identifier.
+	 * @returns The full prefix.
+	 */
 	protected getSubStoragePrefix(prefix: string): string {
 		return this.prefix + "_" + prefix + "_";
 	}
 
+	/**
+	 * Registers a sub-storage.
+	 * @param prefix - The sub-storage identifier.
+	 */
 	protected registerSubStorage(prefix: string): void {
 		const subStorages = this.get("subStorages", false, []);
 		if (!subStorages.includes(prefix)) {
@@ -195,14 +223,20 @@ export class PropertyStorage {
 		}
 	}
 
+	/**
+	 * Retrieves a sub-storage.
+	 * @param prefix - The sub-storage identifier.
+	 * @returns A new PropertyStorage instance with the updated prefix.
+	 */
 	getSubStorage(prefix: string) {
 		this.registerSubStorage(prefix);
 		return new PropertyStorage(this.storage, this.getSubStoragePrefix(prefix));
 	}
 
 	/**
-	 * @internal
 	 * Encodes a value to a Uint8Array.
+	 * @param value - The value to encode.
+	 * @returns The encoded Uint8Array.
 	 */
 	protected encodeValue(value: string | number | boolean): Uint8Array {
 		const binStr = decodeURIComponent(encodeURIComponent(value)),
@@ -215,8 +249,10 @@ export class PropertyStorage {
 	}
 
 	/**
-	 * @internal
-	 * Serializes a value to a string.
+	 * Serializes a value to a JSON string.
+	 * @param data - The data to serialize.
+	 * @param options - Optional serialization options.
+	 * @returns The serialized string.
 	 */
 	protected serialize(data: any, options?: SerializationOptions): string {
 		if (typeof data !== "string")
@@ -225,8 +261,10 @@ export class PropertyStorage {
 	}
 
 	/**
-	 * @internal
-	 * Deserializes a string to a value.
+	 * Deserializes a JSON string to a value.
+	 * @param data - The string to deserialize.
+	 * @param options - Optional deserialization options.
+	 * @returns The deserialized value.
 	 */
 	protected deserialize(data: string, options?: DeserializationOptions): any {
 		try {
@@ -237,10 +275,10 @@ export class PropertyStorage {
 	}
 
 	/**
-	 * @internal
-	 * Asserts that a property is an array.
-	 * @param key The key of the property.
-	 * @param init Whether to initialize the property if it does not exist.
+	 * Ensures that a storage key corresponds to an array.
+	 * @param key - The key to verify.
+	 * @param init - Whether to initialize the array if not exists.
+	 * @returns The array stored at the key.
 	 */
 	protected assertArray(key: string, init: boolean = false): any[] {
 		let property = this.get(key);
@@ -253,14 +291,24 @@ export class PropertyStorage {
 		return property;
 	}
 
-	// Alias for setting multiple key-value pairs, named "storeBulk"
+	/**
+	 * Stores multiple key-value pairs.
+	 * @param pairs - An object with keys and corresponding values.
+	 * @param options - Optional serialization options.
+	 */
 	storeBulk(pairs: Record<string, any>, options?: SerializationOptions): void {
 		for (const key in pairs) {
 			this.set(key, pairs[key], options);
 		}
 	}
 
-	// Alias for getting multiple keys, named "fetchBulk"
+	/**
+	 * Retrieves multiple keys at once.
+	 * @param keys - An array of keys.
+	 * @param deserialize - Whether to deserialize the values.
+	 * @param options - Optional deserialization options.
+	 * @returns An array of values.
+	 */
 	fetchBulk(
 		keys: string[],
 		deserialize: boolean = true,
@@ -269,12 +317,20 @@ export class PropertyStorage {
 		return keys.map((key) => this.get(key, deserialize, undefined, options));
 	}
 
-	// Check if a key exists, named "keyExists"
+	/**
+	 * Checks whether a key exists.
+	 * @param key - The key to check.
+	 * @returns True if exists, false otherwise.
+	 */
 	keyExists(key: string): boolean {
 		return this.get(key) !== undefined;
 	}
 
-	// Retrieve keys matching a pattern, named "searchKeys"
+	/**
+	 * Searches keys matching a given pattern.
+	 * @param pattern - The pattern to match.
+	 * @returns An array of matching keys (without the prefix).
+	 */
 	searchKeys(pattern?: string): string[] {
 		const allKeys = this.getStorage().getDynamicPropertyIds();
 		if (!pattern) return allKeys.map((k) => k.substring(this.prefix.length));
@@ -285,31 +341,66 @@ export class PropertyStorage {
 }
 
 /**
- * Options for serialization using `JSON.stringify`.
+ * Serialization options for JSON.stringify.
+ * @interface
  */
 export interface SerializationOptions {
+	/**
+	 * A function that alters the behavior of the stringification process.
+	 */
 	replacer?: (this: any, key: string, value: any) => any;
+	/**
+	 * A string or number that indicates the indentation of nested structures.
+	 */
 	space?: string | number;
 }
 
 /**
- * Options for deserialization using `JSON.parse`.
+ * Deserialization options for JSON.parse.
+ * @interface
  */
 export interface DeserializationOptions {
+	/**
+	 * A function that transforms the parsed value.
+	 */
 	reviver?: (this: any, key: string, value: any) => any;
 }
 
-/** @hidden */
+/**
+ * Interface representing the dynamic storage backend.
+ * @interface
+ */
 export interface DynamicStorage {
+	/**
+	 * Retrieves the list of dynamic property identifiers.
+	 * @returns An array of key strings.
+	 */
 	getDynamicPropertyIds(): string[];
 
+	/**
+	 * Retrieves a dynamic property by key.
+	 * @param key - The property key.
+	 * @returns The property value, if exists.
+	 */
 	getDynamicProperty(
 		key: string,
 	): undefined | string | number | boolean | Vector3;
 
+	/**
+	 * Clears all dynamic properties.
+	 */
 	clearDynamicProperties(): void;
 
+	/**
+	 * Sets a dynamic property.
+	 * @param identifier - The unique key.
+	 * @param value - Optional value to set.
+	 */
 	setDynamicProperty(identifier: string, value?: any): void;
 
+	/**
+	 * Retrieves the total byte count for dynamic properties.
+	 * @returns The total byte count.
+	 */
 	getDynamicPropertyTotalByteCount(): number;
 }

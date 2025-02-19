@@ -1,14 +1,33 @@
 import { ExtendedStorage, SubIndex } from "./extended-storage";
 
 /**
- * MultiArray is a class that allows to interact with an ordered array stored in the ExtendedStorage.
+ * MultiArray allows interaction with an ordered array stored in ExtendedStorage.
  */
 export class MultiArray {
+	/**
+	 * The key identifying the array.
+	 */
 	private readonly key: string;
+	/**
+	 * The ExtendedStorage instance.
+	 */
 	private readonly storage: ExtendedStorage;
+	/**
+	 * The current array index.
+	 */
 	private readonly index: number;
+	/**
+	 * The sub-index information for navigation.
+	 */
 	private readonly subIndex: SubIndex;
 
+	/**
+	 * Creates a new MultiArray instance.
+	 * @param key - The array key.
+	 * @param storage - The ExtendedStorage instance.
+	 * @param index - The index of the current element.
+	 * @param subIndex - The sub-index containing previous and next pointers.
+	 */
 	constructor(
 		key: string,
 		storage: ExtendedStorage,
@@ -22,7 +41,8 @@ export class MultiArray {
 	}
 
 	/**
-	 * Gets the value of the current element.
+	 * Retrieves the value of the current element.
+	 * @returns The element's value, or undefined if removed.
 	 */
 	getValue(): any {
 		if (this.isRemoved()) return undefined;
@@ -31,7 +51,8 @@ export class MultiArray {
 
 	/**
 	 * Sets the value of the current element.
-	 * @param value The value to set.
+	 * @param value - The value to set.
+	 * @throws Error if the element has been removed.
 	 */
 	setValue(value: any): void {
 		if (this.isRemoved())
@@ -40,8 +61,8 @@ export class MultiArray {
 	}
 
 	/**
-	 * Gets the next element in the array.
-	 * Returns `undefined` if the current element is the last one.
+	 * Retrieves the next element in the array.
+	 * @returns A new MultiArray instance for the next element or null if at the end.
 	 */
 	getNext(): MultiArray | null {
 		if (this.subIndex.next === null) return null;
@@ -51,8 +72,8 @@ export class MultiArray {
 	}
 
 	/**
-	 * Gets the previous element in the array.
-	 * Returns `null` if the current element is the first one.
+	 * Retrieves the previous element in the array.
+	 * @returns A new MultiArray instance for the previous element or null if at the beginning.
 	 */
 	getPrev(): MultiArray | null {
 		if (this.subIndex.prev === null) return null;
@@ -63,13 +84,14 @@ export class MultiArray {
 
 	/**
 	 * Checks whether the current element has been removed.
+	 * @returns True if removed.
 	 */
 	isRemoved(): boolean {
 		return this.storage.get(this.key + ".ar." + this.index) === undefined;
 	}
 
 	/**
-	 * Removes the current element from the array.
+	 * Removes the current element from the array and updates neighbors.
 	 */
 	remove(): void {
 		if (this.subIndex.prev !== null) {
@@ -87,7 +109,7 @@ export class MultiArray {
 
 	/**
 	 * Inserts a new element after the current element.
-	 * @param value The value to insert.
+	 * @param value - The value to insert.
 	 */
 	insertAfter(value: any): void {
 		const index = this.storage.getArrayIndex(this.key);
@@ -105,7 +127,7 @@ export class MultiArray {
 
 	/**
 	 * Inserts a new element before the current element.
-	 * @param value The value to insert.
+	 * @param value - The value to insert.
 	 */
 	insertBefore(value: any): void {
 		const index = this.storage.getArrayIndex(this.key);
