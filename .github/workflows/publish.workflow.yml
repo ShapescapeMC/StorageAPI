@@ -70,7 +70,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Publish to GitHub Package Registry
+      - name: Publish to NPM Package Registry
         run: |
           if [[ $(git describe --tags --abbrev=0) =~ "beta" ]]; then
             echo "Publishing beta"
