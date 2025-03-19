@@ -102,7 +102,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm install
@@ -112,11 +112,11 @@ jobs:
           if [[ $(git describe --tags --abbrev=0) =~ "beta" ]]; then
             echo "Publishing beta"
             git describe --tags --abbrev=0
-            npm publish --tag beta
+            npm publish --tag beta --access public
           else
             echo "Publishing stable"
             git describe --tags --abbrev=0
-            npm publish
+            npm publish --access public
           fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
