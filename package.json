@@ -7,7 +7,7 @@
 	"scripts": {
 		"build": "tsup",
 		"tsbuild": "tsc",
-		"test": "jest",
+		"test": "jest --passWithNoTests",
 		"lint": "eslint src --ext .ts",
 		"docs": "typedoc",
 		"prepublishOnly": "npm run build"
