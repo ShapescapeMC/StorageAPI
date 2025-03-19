@@ -25,44 +25,13 @@ jobs:
       - name: Run tests
         run: npm run test
 
-  generate-events:
+  generate-docs:
     runs-on: ubuntu-latest
     needs: do-tests
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run generateEvents script
-        run: npm run generateEvents
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-events
-          path: build/
-
-  generate-docs:
-    runs-on: ubuntu-latest
-    needs: generate-events
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-events
-          path: src/events/
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -83,7 +52,7 @@ jobs:
 
   publish-package:
     runs-on: ubuntu-latest
-    needs: generate-events
+    needs: do-tests
     permissions:
       contents: read
       packages: write
@@ -91,12 +60,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-events
-          path: src/events/
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
