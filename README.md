@@ -1,6 +1,6 @@
 # Shapescape@Storage
 
-[![Publish](https://github.com/Shapescape-Software/ShapeScriptAPI/actions/workflows/publish.workflow.yml/badge.svg?branch=main)](https://github.com/Shapescape-Software/ShapeScriptAPI/actions/workflows/publish.workflow.yml)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ShapescapeMC/StorageAPI/publish.workflow.yml?style=for-the-badge&label=Publish)
 
 ## Overview
 
