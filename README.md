@@ -108,6 +108,10 @@ if (storage.keyExists("key1")) {
 
 Ensure that you deploy and run this API within an environment that supports these Minecraft-specific features.
 
+## License
+
+Educator Tools is licensed under the **[LGPL v3 License](LICENSE)**.
+
 ## Contributing
 
 Contributions are welcome as long as they align with the goal of maintaining compatibility with Minecraft Bedrock. Before submitting a pull request, please ensure your changes are tested within the Minecraft Bedrock environment.
