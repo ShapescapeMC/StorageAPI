@@ -17,11 +17,11 @@
 
 ## Installation
 
-You can install the package via npm. This project is part of the ShapeStorageAPI:
+You can install the package via npm. This project is part of the StorageAPI:
 ```bash
 npm install @shapescape/storage
 ```
-*Ensure you have configured access to the GitHub Package Registry.*
+
 
 ## Usage
 
