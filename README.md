@@ -110,7 +110,7 @@ Ensure that you deploy and run this API within an environment that supports thes
 
 ## License
 
-Educator Tools is licensed under the **[LGPL v3 License](LICENSE)**.
+StoreAPI is licensed under the **[LGPL v3 License](LICENSE)**.
 
 ## Contributing
 
