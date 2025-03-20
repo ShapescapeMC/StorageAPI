@@ -1,10 +1,10 @@
-# Shapescape@Storage
+# @Shapescape/Storage
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ShapescapeMC/StorageAPI/publish.workflow.yml?style=for-the-badge&label=Publish)
 
 ## Overview
 
-**Shapescape@Storage** is a storage abstraction designed exclusively for Minecraft Bedrock. It leverages Minecraft's dynamic storage system, supporting both standard storage and extended storage capabilities that allow you to store values larger than 32KiB. The project offers a set of commands similar to Redis (with different naming) to manage stored data in an intuitive manner.
+**@Shapescape/Storage** is a storage abstraction designed exclusively for Minecraft Bedrock. It leverages Minecraft's dynamic storage system, supporting both standard storage and extended storage capabilities that allow you to store values larger than 32KiB. The project offers a set of commands similar to Redis (with different naming) to manage stored data in an intuitive manner.
 
 ## Key Features
 
