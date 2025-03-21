@@ -12,7 +12,6 @@ StorageAPI is a storage abstraction designed exclusively for Minecraft Bedrock. 
 - **Dynamic Property Storage**: Uses Minecraft's dynamic storage to store and retrieve JSON-serializable data.
 - **Extended Storage**: Automatically splits values into chunked segments if they exceed the Minecraft storage limit.
 - **Array & Linked List Support**: Manage arrays as JSON objects or as linked lists using the `MultiArray` class.
-- **Command Set Similar to Redis**: Offers instructions such as `store`, `fetch`, `storeBulk`, `fetchBulk`, `drop`, `keyExists`, and `searchKeys` for a familiar API style.
 - **In-Memory Caching**: `CachedStorage` provides an optional cache to speed up repeated data access.
 
 ## Installation
@@ -74,29 +73,6 @@ const firstValue = pointer.getValue(); // 1
 pointer = pointer.getNext();
 if (pointer) {
     const secondValue = pointer.getValue(); // 2
-}
-```
-
-### Using the Similar Command Set
-A Redis-like command set is available but with different naming:
-```typescript
-// Using PropertyStorage (or any derived storage)
-const storage = new Storage(world);
-
-// Store and fetch a key:
-storage.store("test", "value");
-const value = storage.fetch("test");
-
-// Store multiple keys:
-storage.storeBulk({ key1: "value1", key2: "value2" });
-const values = storage.fetchBulk(["key1", "key2"]);
-
-// Remove a key:
-storage.drop("test");
-
-// Check if a key exists and search for keys:
-if (storage.keyExists("key1")) {
-    const keys = storage.searchKeys("key");
 }
 ```
 
