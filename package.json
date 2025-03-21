@@ -1,6 +1,6 @@
 {
 	"name": "@shapescape/storage",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"license": "LGPL-3.0-or-later",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
