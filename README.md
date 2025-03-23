@@ -27,7 +27,7 @@ npm install @shapescape/storage
 ### Dynamic Property Storage
 The basic storage class is a wrapper around Minecraft’s dynamic storage:
 ```typescript
-const storage = new Storage(world);
+const storage = new PropertyStorage(world);
 storage.set("test", "test");
 const value = storage.get("test");
 
