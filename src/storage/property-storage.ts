@@ -227,7 +227,7 @@ export class PropertyStorage {
 	 * @param prefix - The sub-storage identifier.
 	 */
 	protected registerSubStorage(prefix: string): void {
-		const subStorages = this.get("subStorages", false, []);
+		const subStorages = this.get("subStorages", true, []);
 		if (!subStorages.includes(prefix)) {
 			subStorages.push(prefix);
 			this.set("subStorages", subStorages);
