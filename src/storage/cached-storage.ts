@@ -81,35 +81,6 @@ export class CachedStorage extends PropertyStorage {
 	}
 
 	/**
-	 * Retrieves all key-value pairs that match the specified pattern.
-	 * @param pattern - A pattern to filter keys.
-	 * @param deserialize - Whether to deserialize the values.
-	 * @param options - Optional deserialization options.
-	 * @returns An array of key-value pair objects.
-	 */
-	getAll(
-		pattern?: string,
-		deserialize?: boolean,
-		options?: DeserializationOptions,
-	): Record<string, any>[] {
-		const properties: Record<string, any>[] = [];
-		const keys = this.getStorage().getDynamicPropertyIds();
-		if (!pattern) pattern = this.prefix;
-		else pattern = this.prefix + pattern;
-		for (let key of keys) {
-			if (key.startsWith(pattern)) {
-				key = key.slice(this.prefix.length);
-				let value = this.cache.get(key);
-				if (!value) value = this.getStorage().getDynamicProperty(key);
-				if (typeof value === "string" && deserialize)
-					properties.push({ [key]: this.deserialize(value, options) });
-				else properties.push({ [key]: value });
-			}
-		}
-		return properties;
-	}
-
-	/**
 	 * Retrieves a sub-storage instance with a given prefix.
 	 * @param prefix - The sub-storage identifier.
 	 * @returns A new CachedStorage instance.

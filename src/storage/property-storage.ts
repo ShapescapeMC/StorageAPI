@@ -141,10 +141,8 @@ export class PropertyStorage {
 		for (let key of keys) {
 			if (key.startsWith(pattern)) {
 				key = key.slice(this.prefix.length);
-				const value = this.getStorage().getDynamicProperty(key);
-				if (typeof value === "string" && deserialize)
-					properties.push({ [key]: this.deserialize(value, options) });
-				else properties.push({ [key]: value });
+				let value = this.get(key, deserialize, undefined, options);
+				properties.push({ [key]: value });
 			}
 		}
 		return properties;
