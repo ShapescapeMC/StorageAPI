@@ -149,6 +149,20 @@ export class PropertyStorage {
 	}
 
 	/**
+	 * Retrieves all keys matching a given pattern.
+	 * @param pattern - The pattern to match keys against.
+	 * @returns An array of keys (without the prefix).
+	 */
+	getKeys(pattern?: string): string[] {
+		const keys = this.getStorage().getDynamicPropertyIds();
+		if (!pattern) pattern = this.prefix;
+		else pattern = this.prefix + pattern;
+		return keys
+			.filter((key) => key.startsWith(pattern))
+			.map((key) => key.slice(this.prefix.length));
+	}
+
+	/**
 	 * Pushes a value to the end of an array stored in the storage.
 	 * @param key - The key of the array.
 	 * @param value - The value to push.
